@@ -1,15 +1,15 @@
 version: "3.9"
 
 services:
-  platform_db:
+  platform-db:
     image: postgres
-    container_name: platform_db
+    container_name: platform-db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_HOST=platform_db
+      - POSTGRES_HOST=platform-db
       - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
       - "5432:5432"
@@ -18,12 +18,12 @@ services:
     networks:
       - network
 
-  platform_backend:
-    container_name: platform_backend
-    build: ../platform_backend
+  platform-backend:
+    container_name: platform-backend
+    build: ../platform-backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ../platform_backend:/app
+      - ../platform-backend:/app
     environment:
       - DJANGO_SETTINGS_MODULE=webapp.settings
     env_file:
@@ -31,7 +31,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - platform_db
+      - platform-db
     networks:
       - network
 
