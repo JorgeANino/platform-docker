@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  platform_db:
+    image: postgres
+    container_name: platform_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=platform_db
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - network
+
+  platform_backend:
+    container_name: platform_backend
+    build: ../platform_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ../platform_backend:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=webapp.settings
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - platform_db
+    networks:
+      - network
+
+  platform_pgadmin:
+    image: dpage/pgadmin4
+    container_name: platform_pgadmin4_container
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
+      PGADMIN_CONFIG_LOGIN_DISABLED: 'True'
+      PGADMIN_DEFAULT_EMAIL: admin@postgres.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  pgadmin-data:
+
+
+networks:
+  network:
+    driver: bridge
